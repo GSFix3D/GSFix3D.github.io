@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="GSFix3D: Diffusion-Guided Repair of Novel Views in Gaussian Splatting">
+  <meta name="keywords" content="Novel view repair, 3D reconstruction, Gaussian splatting">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSFix3D: Diffusion-Guided Repair of Novel Views in Gaussian Splatting</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/carousel.css">
+  <script src="./static/js/carousel.js" defer></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/script.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-widescreen">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">GSFix3D: Diffusion-Guided Repair of Novel Views in Gaussian Splatting</h1>      
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://goldoak.github.io/">Jiaxin Wei</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://mrl.ethz.ch/">Stefan Leutenegger</a><sup>1,2</sup>,</span>
+            <span class="author-block">
+              <a href="https://simon-schaefer.github.io/">Simon Schaefer</a><sup>1</sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Technical University of Munich,</span>
+            <span class="author-block"><sup>2</sup>ETH Zurich</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span>                            
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-widescreen">
+    <div class="hero-body">
+      <div class="container is-max-widescreen">
+        <div class="carousel-wrapper">
+          <div class="carousel-track">
+            <div class="carousel-slide"><video muted playsinline><source src="./static/videos/splatam_f3_demo.mp4" type="video/mp4"></video></div>
+            <div class="carousel-slide"><video muted playsinline><source src="./static/videos/rtg_b2_demo.mp4" type="video/mp4"></video></div>
+            <div class="carousel-slide"><video muted playsinline><source src="./static/videos/gsfusion_39_demo.mp4" type="video/mp4"></video></div>
+            <div class="carousel-slide"><video muted playsinline><source src="./static/videos/gsfusion_room1_demo.mp4" type="video/mp4"></video></div>
+            <div class="carousel-slide"><video muted playsinline><source src="./static/videos/outdoor_lidar_demo.mp4" type="video/mp4"></video></div>
+          </div>
+
+          <!-- Arrows -->
+          <div class="carousel-arrow left">&#10094;</div>
+          <div class="carousel-arrow right">&#10095;</div>
+
+          <!-- Dots -->
+          <div class="carousel-dots"></div>
+        </div>
+
+        <h2 class="subtitle has-text-centered">
+          <span>TL;DR: Remove artifacts and fill holes for novel views in 3DGS scenes.</span>
+        </h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-widescreen">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Recent developments in 3D Gaussian Splatting have significantly enhanced novel view synthesis, yet generating high-quality renderings from extreme novel viewpoints or partially observed regions remains challenging. Meanwhile, diffusion models exhibit strong generative capabilities, but their reliance on text prompts and lack of awareness of specific scene information hinder accurate 3D reconstruction tasks. To address these limitations, we introduce <b>GSFix3D</b>, a novel framework that improves the visual fidelity in under-constrained regions by distilling prior knowledge from diffusion models into 3D representations, while preserving consistency with observed scene details. At its core is <b>GSFixer</b>, a latent diffusion model obtained via our customized fine-tuning protocol that can leverage both mesh and 3D Gaussians to adapt pretrained generative models to a variety of environments and artifact types from different reconstruction methods, enabling robust novel view repair for unseen camera poses. Moreover, we propose a random mask augmentation strategy that empowers GSFixer to plausibly inpaint missing regions. Experiments on challenging benchmarks demonstrate that our GSFix3D and GSFixer achieve state-of-the-art performance, requiring only minimal scene-specific fine-tuning on captured data. Real-world test further confirms its resilience to potential pose errors.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section m-0 p-0">
+  <div class="container is-max-widescreen">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Method Overview</h2>
+    
+        <div class="column pt-0">
+          <figure class="image is-full-width">
+            <img src="./static/images/pipeline.png"/>
+          </figure>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            Given initial 3D reconstructions in the form of mesh and 3DGS, we render novel views and use them as conditional inputs to GSFixer. Through a reverse diffusion process, GSFixer generates repaired images with artifacts removed and missing regions inpainted. These outputs are then distilled back into 3D by optimizing the 3DGS representation using photometric loss.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-widescreen content">
+    <div class="has-text-centered">
+      <h2 class="title is-3">Qualitative Results</h2>
+      <div class="content has-text-justified">
+        <p>
+          We compare our method against 
+          <a href="https://github.com/nv-tlabs/Difix3D" target="_blank">DIFIX and DIFIX-ref</a> on novel views from the ScanNet++ and Replica datasets.
+
+        </p>
+      </div>
+
+      <!-- Row 1 -->
+      <h3 class="title is-4">ScanNet++</h3>
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 1 -->
+          <div id="example1" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/splatam_b2_difix.png" alt="DIFIX">
+              <div class="bal-afterPosition afterLabel">DIFIX</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/splatam_b2_gs.png" alt="SplaTAM">
+                <div class="bal-beforePosition beforeLabel">SplaTAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 2 -->
+          <div id="example2" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/splatam_b2_difix-ref.png" alt="DIFIX-ref">
+              <div class="bal-afterPosition afterLabel">DIFIX-ref</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/splatam_b2_gs.png" alt="SplaTAM">
+                <div class="bal-beforePosition beforeLabel">SplaTAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 3 -->
+          <div id="example3" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/splatam_b2_gsfixer.png" alt="GSFixer">
+              <div class="bal-afterPosition afterLabel">GSFixer</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/splatam_b2_gs.png" alt="SplaTAM">
+                <div class="bal-beforePosition beforeLabel">SplaTAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Row 2 -->
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 4 -->
+          <div id="example4" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/rtg_39_difix.png" alt="DIFIX">
+              <div class="bal-afterPosition afterLabel">DIFIX</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/rtg_39_gs.png" alt="RTG-SLAM">
+                <div class="bal-beforePosition beforeLabel">RTG-SLAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 5 -->
+          <div id="example5" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/rtg_39_difix-ref.png" alt="DIFIX-ref">
+              <div class="bal-afterPosition afterLabel">DIFIX-ref</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/rtg_39_gs.png" alt="RTG-SLAM">
+                <div class="bal-beforePosition beforeLabel">RTG-SLAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 6 -->
+          <div id="example6" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/rtg_39_gsfixer.png" alt="GSFixer">
+              <div class="bal-afterPosition afterLabel">GSFixer</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/rtg_39_gs.png" alt="RTG-SLAM">
+                <div class="bal-beforePosition beforeLabel">RTG-SLAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Row 3 -->
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 7 -->
+          <div id="example7" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/gsfusion_8b_difix.png" alt="DIFIX">
+              <div class="bal-afterPosition afterLabel">DIFIX</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/gsfusion_8b_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 8 -->
+          <div id="example8" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/gsfusion_8b_difix-ref.png" alt="DIFIX-ref">
+              <div class="bal-afterPosition afterLabel">DIFIX-ref</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/gsfusion_8b_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 9 -->
+          <div id="example9" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/gsfusion_8b_gsfixer.png" alt="GSFixer">
+              <div class="bal-afterPosition afterLabel">GSFixer</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/gsfusion_8b_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Row 4 -->
+      <h3 class="title is-4">Replica</h3>
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 10 -->
+          <div id="example10" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/splatam_room2_difix.png" alt="DIFIX">
+              <div class="bal-afterPosition afterLabel">DIFIX</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/splatam_room2_gs.png" alt="SplaTAM">
+                <div class="bal-beforePosition beforeLabel">SplaTAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 11 -->
+          <div id="example11" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/splatam_room2_difix-ref.png" alt="DIFIX-ref">
+              <div class="bal-afterPosition afterLabel">DIFIX-ref</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/splatam_room2_gs.png" alt="SplaTAM">
+                <div class="bal-beforePosition beforeLabel">SplaTAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 12 -->
+          <div id="example12" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/splatam_room2_gsfixer.png" alt="GSFixer">
+              <div class="bal-afterPosition afterLabel">GSFixer</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/splatam_room2_gs.png" alt="SplaTAM">
+                <div class="bal-beforePosition beforeLabel">SplaTAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Row 5 -->
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 13 -->
+          <div id="example13" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/rtg_office2_difix.png" alt="DIFIX">
+              <div class="bal-afterPosition afterLabel">DIFIX</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/rtg_office2_gs.png" alt="RTG-SLAM">
+                <div class="bal-beforePosition beforeLabel">RTG-SLAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 14 -->
+          <div id="example14" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/rtg_office2_difix-ref.png" alt="DIFIX-ref">
+              <div class="bal-afterPosition afterLabel">DIFIX-ref</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/rtg_office2_gs.png" alt="RTG-SLAM">
+                <div class="bal-beforePosition beforeLabel">RTG-SLAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 15 -->
+          <div id="example15" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/rtg_office2_gsfixer.png" alt="GSFixer">
+              <div class="bal-afterPosition afterLabel">GSFixer</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/rtg_office2_gs.png" alt="RTG-SLAM">
+                <div class="bal-beforePosition beforeLabel">RTG-SLAM</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Row 6 -->
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 16 -->
+          <div id="example16" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/gsfusion_room1_difix.png" alt="DIFIX">
+              <div class="bal-afterPosition afterLabel">DIFIX</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/gsfusion_room1_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 17 -->
+          <div id="example17" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/gsfusion_room1_difix-ref.png" alt="DIFIX-ref">
+              <div class="bal-afterPosition afterLabel">DIFIX-ref</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/gsfusion_room1_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 18 -->
+          <div id="example18" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/gsfusion_room1_gsfixer.png" alt="GSFixer">
+              <div class="bal-afterPosition afterLabel">GSFixer</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/gsfusion_room1_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+  new BeforeAfter({
+    id: '#example1'
+  });
+  new BeforeAfter({
+    id: '#example2'
+  });
+  new BeforeAfter({
+    id: '#example3'
+  });
+  new BeforeAfter({
+    id: '#example4'
+  });
+
+  new BeforeAfter({
+    id: '#example5'
+  });
+  new BeforeAfter({
+    id: '#example6'
+  });
+  new BeforeAfter({
+    id: '#example7'
+  });
+  new BeforeAfter({
+    id: '#example8'
+  });
+
+  new BeforeAfter({
+    id: '#example9'
+  });
+  new BeforeAfter({
+    id: '#example10'
+  });
+  new BeforeAfter({
+    id: '#example11'
+  });
+  new BeforeAfter({
+    id: '#example12'
+  });
+
+  new BeforeAfter({
+    id: '#example13'
+  });
+  new BeforeAfter({
+    id: '#example14'
+  });
+  new BeforeAfter({
+    id: '#example15'
+  });
+  new BeforeAfter({
+    id: '#example16'
+  });
+  new BeforeAfter({
+    id: '#example17'
+  });
+  new BeforeAfter({
+    id: '#example18'
+  });
+
+</script>
+
+
+<section class="section">
+  <div class="container is-max-widescreen">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h2 class="title is-3">Real-World Results</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            We collect a stereo sequence inside a ship structure using an Intel RealSense D455 camera and process it with <a href="https://github.com/ethz-mrl/GSFusion" target="_blank">GSFusion</a>. Also, we evaluate an outdoor scene from the <a href="https://github.com/hku-mars/FAST-LIVO" target="_blank">FAST-LIVO</a> dataset using <a href="https://github.com/APRIL-ZJU/Gaussian-LIC" target="_blank">Gaussian-LIC</a>, a LiDAR-Inertial-Camera Gaussian Splatting SLAM system.
+          </p>
+        </div>
+
+        <!-- Row 1 -->
+      <h3 class="title is-4">Self-collected Ship Data</h3>
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 19 -->
+          <div id="example19" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/ship_00_gsfixer3d.png" alt="GSFixer3D">
+              <div class="bal-afterPosition afterLabel">GSFixer3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/ship_00_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 20 -->
+          <div id="example20" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/ship_01_gsfixer3d.png" alt="GSFixer3D">
+              <div class="bal-afterPosition afterLabel">GSFixer3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/ship_01_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 21 -->
+          <div id="example21" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/ship_02_gsfixer3d.png" alt="GSFixer3D">
+              <div class="bal-afterPosition afterLabel">GSFixer3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/ship_02_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 22 -->
+          <div id="example22" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/ship_04_gsfixer3d.png" alt="GSFixer3D">
+              <div class="bal-afterPosition afterLabel">GSFixer3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/ship_04_gs.png" alt="GSFusion">
+                <div class="bal-beforePosition beforeLabel">GSFusion</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Row 2 -->
+       <h3 class="title is-4">FAST-LIVO Outdoor Scene</h3>
+      <div class="columns is-centered">
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 23 -->
+          <div id="example23" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/outdoor_00_gsfixer3d.png" alt="GSFix3D">
+              <div class="bal-afterPosition afterLabel">GSFix3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/outdoor_00_gs.png" alt="Gaussian-LIC">
+                <div class="bal-beforePosition beforeLabel">Gaussian-LIC</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 24 -->
+          <div id="example24" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/outdoor_02_gsfixer3d.png" alt="GSFix3D">
+              <div class="bal-afterPosition afterLabel">GSFix3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/outdoor_02_gs.png" alt="Gaussian-LIC">
+                <div class="bal-beforePosition beforeLabel">Gaussian-LIC</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 25 -->
+          <div id="example25" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/outdoor_06_gsfixer3d.png" alt="GSFixer3D">
+              <div class="bal-afterPosition afterLabel">GSFixer3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/outdoor_06_gs.png" alt="Gaussian-LIC">
+                <div class="bal-beforePosition beforeLabel">Gaussian-LIC</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <!-- Gallery Item 26 -->
+          <div id="example26" class="bal-container-small">
+            <div class="bal-after">
+              <img src="./static/images/outdoor_07_gsfixer3d.png" alt="GSFixer3D">
+              <div class="bal-afterPosition afterLabel">GSFixer3D</div>
+            </div>
+            <div class="bal-before" style="width:50%;">
+              <div class="bal-before-inset">
+                <img src="./static/images/outdoor_07_gs.png" alt="Gaussian-LIC">
+                <div class="bal-beforePosition beforeLabel">Gaussian-LIC</div>
+              </div>
+            </div>
+            <div class="bal-handle" style="left:50%;">
+              <span class="handle-left-arrow"></span>
+              <span class="handle-right-arrow"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  new BeforeAfter({
+    id: '#example19'
+  });
+  new BeforeAfter({
+    id: '#example20'
+  });
+  new BeforeAfter({
+    id: '#example21'
+  });
+  new BeforeAfter({
+    id: '#example22'
+  });
+
+  new BeforeAfter({
+    id: '#example23'
+  });
+  new BeforeAfter({
+    id: '#example24'
+  });
+  new BeforeAfter({
+    id: '#example25'
+  });
+  new BeforeAfter({
+    id: '#example26'
+  });
+</script>
+
+
+<section class="section">
+  <div class="container is-max-widescreen">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Acknowledgment</h2>
+        <div class="content has-text-justified">
+          <p>
+            The authors gratefully acknowledge support from the EU project AUTOASSESS (Grant 101120732). We also thank Jaehyung Jung and Sebastián Barbas Laina for their assistance with ship data collection and processing, and Helen Oleynikova for her valuable feedback on the manuscript.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- <section class="section" id="BibTeX">
+  <div class="container is-max-widescreen content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>
+      
+    </code></pre>
+  </div>
+</section> -->
+
+
+<footer class="footer">
+  <div class="container is-max-widescreen content">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is adapted from the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> template and is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
